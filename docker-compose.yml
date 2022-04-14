@@ -1,0 +1,32 @@
+version: "3.3"
+
+services:
+    pgdb:
+        image: postgres:12.1
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+    web:
+        build: .
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - .:/usr/src/app/
+        ports:
+            - 8000:8000
+        depends_on:
+            - pgdb
+    celery:
+        restart: always
+        build:
+            context: .
+        command: celery -A support_app worker -l info
+        volumes:
+            - .:/usr/src/app
+        depends_on:
+            - pgdb
+            - redis
+            - web
+    redis:
+        image: redis:alpine
+
+volumes:
+    postgres_data:
