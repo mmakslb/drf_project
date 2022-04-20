@@ -18,18 +18,18 @@ To **Log In** user you should send POST request to *http://127.0.0.1:8000/auth/j
 </br>After that you will get access token, that you can use it to authorization.
 
 ## Add new Question and get List of actual questions
-To create new question you should send POST request to *http://127.0.0.1:8000/questions/all/*
+To create new question you should send POST request to *http://127.0.0.1:8000/questions/main/*
 </br>Requirement fields: text, title.
 
-If you want to get list of actual questions, you should send GET request to *http://127.0.0.1:8000/questions/all/* 
+If you want to get list of actual questions, you should send GET request to *http://127.0.0.1:8000/questions/main/* 
 </br>(For **admin** user this link will show all types of questions. For **authenticated user** this link will show only actual questions)
 
 ## Add answer to question
-To send an answer to a question you should send POST request to *http://127.0.0.1:8000/questions/all/pk/* 
+To send an answer to a question you should send POST request to *http://127.0.0.1:8000/questions/main/pk/* 
 </br>Requirement fields: text.
 
 
-If you want to see details of question send GET request to *http://127.0.0.1:8000/questions/all/pk/*
+If you want to see details of question send GET request to *http://127.0.0.1:8000/questions/main/pk/*
 
 ## Get list of solved and frozen questions
 If you want to see solved or frozen questions send GET request to:
@@ -38,7 +38,7 @@ If you want to see solved or frozen questions send GET request to:
 
 ## Change status of question(only for admin user)
 If you want to change status of question send PATCH request to:
-- *http://127.0.0.1:8000/questions/all/pk/*
+- *http://127.0.0.1:8000/questions/main/pk/*
 - *http://127.0.0.1:8000/questions/solved/pk/*
 - *http://127.0.0.1:8000/questions/frozen/pk/*
 </br>Requirement field: status.

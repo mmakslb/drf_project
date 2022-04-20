@@ -1,4 +1,4 @@
-from rest_framework import serializers, request
+from rest_framework import serializers
 from .models import Message, Question
 from django.contrib.auth import get_user_model
 
@@ -28,4 +28,3 @@ class QuestionDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = ['id', 'title', 'text', 'slug', 'status', 'timestamp', 'sender', 'messages']
-

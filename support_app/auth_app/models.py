@@ -24,6 +24,3 @@ class User(AbstractBaseUser, PermissionsMixin):
         verbose_name = _('user')
         verbose_name_plural = _('users')
         unique_together = ('username', 'email', 'phone')
-
-
-

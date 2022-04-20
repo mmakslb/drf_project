@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 from django.db.models.signals import pre_save
 from django.dispatch import receiver
 from django.template.defaultfilters import slugify
@@ -12,12 +13,20 @@ User = get_user_model()
 
 
 class Question(models.Model):
+    class Status(models.TextChoices):
+        ACTUAL = 'actual', _('Actual')
+        SOLVED = 'solved', _('Solved')
+        FROZEN = 'frozen', _('Frozen')
+
     sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_sender')
     title = models.CharField(max_length=100)
     text = models.CharField(max_length=500)
     slug = models.SlugField(blank=True)
-    status = models.CharField(default='actual', max_length=6, choices=[('actual', 'actual'),
-                                                                       ('solved', 'solved'), ('frozen', 'frozen')])
+    status = models.CharField(
+        max_length=6,
+        choices=Status.choices,
+        default=Status.ACTUAL,
+    )
     timestamp = models.DateTimeField(auto_now_add=datetime.datetime.now())
 
     class Meta:
@@ -49,5 +58,3 @@ def rand_slug():
 def slugify_name(instance, *args, **kwargs):
     if not instance.slug:
         instance.slug = slugify(rand_slug() + "-" + instance.title)
-
-

@@ -34,8 +34,9 @@ class UserManager(BaseUserManager):
                 **extra_fields
             )
 
-        # проверяем является ли пользователь
-        # суперпользователем
+        """
+        Check superuser or not
+        """
         if extra_fields.get('is_superuser'):
             user = self.model(
                 username=username,

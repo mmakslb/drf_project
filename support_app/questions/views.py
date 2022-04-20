@@ -1,7 +1,7 @@
 from rest_framework import viewsets, permissions, status
 from django.db.models import Q
 from .tasks import send_email_message
-from django.http.response import JsonResponse
+from django.http.response import JsonResponse, HttpResponseNotAllowed
 from .models import Question
 from .serializers import MessageSerializer, QuestionSerializer, QuestionDetailSerializer
 
@@ -52,14 +52,17 @@ class QuestionViewSet(viewsets.ModelViewSet):
 
     def post(self, request, *args, **kwargs):
         question = Question.objects.get(pk=self.kwargs['pk'])
-        request.data.update({'sender': self.request.user, 'question': question.id})
-        data = request.data
-        serializer = MessageSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
+        if question.status != 'actual':
+            return HttpResponseNotAllowed('')
+        else:
+            request.data.update({'sender': self.request.user, 'question': question.id})
+            data = request.data
+            serializer = MessageSerializer(data=data)
+            if serializer.is_valid():
+                serializer.save()
+                return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
 
-        return JsonResponse(serializer.errors, status=400)
+            return JsonResponse(serializer.errors, status=400)
 
 
 class SolvedViewSet(viewsets.ModelViewSet):
@@ -145,4 +148,3 @@ class FrozenViewSet(viewsets.ModelViewSet):
             return self.serializer_action_classes[self.action]
         except(KeyError, AttributeError):
             return super().get_serializer_class()
-

@@ -20,5 +20,3 @@ class MessageInline(admin.TabularInline):
 class QuestionAdmin(admin.ModelAdmin):
     list_display = ['id', 'sender', 'title', 'status', 'timestamp']
     inlines = [MessageInline, ]
-
-

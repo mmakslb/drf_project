@@ -5,5 +5,5 @@ def send(user_email, question_title, question_status):
     send_mail('Support APP',
               f'Status of your question "{question_title}" has been changed to {question_status}',
               'mailfortests80@gmail.com',
-              [f'{user_email}', ])
-
+              [f'{user_email}', ]
+              )
