@@ -2,10 +2,11 @@
 ## Installation Guide
 Clone this project to  your local machine with installed Docker.
 </br> Execute next commands to create and run Docker containers:
-* docker-compose build
-* docker-compose run web python manage.py migrate
-* docker-compose run web python manage.py createsuperuser
-* docker-compose up
+* docker-compose up --build
+
+Execute next commands to create superuser:
+* docker exec -it support_app_web bash
+* python manage.py createsuperuser
 
 ## Sign Up and Log In User
 To **Sign Up** new user you should send POST request to *http://127.0.0.1:8000/auth/users/*

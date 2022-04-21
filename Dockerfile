@@ -8,13 +8,11 @@ RUN mkdir /app
 ENV VIRTUAL_ENV=/app/venv
 RUN python -m venv $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+RUN pip install --upgrade pip
+
 COPY ./requirements.txt .
 RUN pip install -r requirements.txt
 
 COPY ./support_app /app/
 WORKDIR /app/
-
-EXPOSE 8000
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
-
-

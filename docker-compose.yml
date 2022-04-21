@@ -3,30 +3,42 @@ version: "3.3"
 services:
     pgdb:
         image: postgres:12.1
+        container_name: support_app_pgdb
         volumes:
             - postgres_data:/var/lib/postgresql/data/
+        env_file:
+            - ./.env
+        ports:
+            - 5432:5432
     web:
-        build: .
-        command: python manage.py runserver 0.0.0.0:8000
+        build: ./
+        container_name: support_app_web
+        command: bash entrypoint.sh
         volumes:
             - .:/usr/src/app/
         ports:
             - 8000:8000
+        env_file:
+            - ./.env
         depends_on:
             - pgdb
     celery:
         restart: always
         build:
-            context: .
+            context: ./
+        container_name: support_app_celery
         command: celery -A support_app worker -l info
         volumes:
-            - .:/usr/src/app
+            - .:/usr/src/app/
+        env_file:
+            - ./.env
         depends_on:
             - pgdb
             - redis
             - web
     redis:
         image: redis:alpine
+        container_name: support_app_redis
 
 volumes:
     postgres_data:
