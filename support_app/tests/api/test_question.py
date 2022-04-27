@@ -1,22 +1,19 @@
 import pytest
-from rest_framework.test import APIClient
-
-client = APIClient()
 
 
 @pytest.mark.django_db
-def test_create_question(create_superuser):
+def test_create_question(create_superuser, client):
     create_superuser(
-        username='maksim',
-        password='Testpassword',
-        email='mmakslb@gmail.com'
+        username='Admin',
+        password='Admin',
+        email=''
     )
 
     response = client.post(
         "/auth/jwt/create/",
         dict(
-            username="maksim",
-            password="Testpassword"
+            username="Admin",
+            password="Admin"
         )
     )
 

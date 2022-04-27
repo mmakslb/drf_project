@@ -9,18 +9,24 @@ from .serializers import MessageSerializer, QuestionSerializer, QuestionDetailSe
 class QuestionViewSet(viewsets.ModelViewSet):
     serializer_class = QuestionSerializer
 
-    def get_permissions(self):
+    def get_permissions(self) -> list:
+        """
+        Gets permission
+        """
         if self.action == 'partial_update' or self.action == 'update' or self.action == 'destroy':
             permission_classes = [permissions.IsAdminUser]
         else:
             permission_classes = [permissions.IsAuthenticated]
         return [permission() for permission in permission_classes]
 
-    def get_queryset(self, *args, **kwargs):
+    def get_queryset(self, *args, **kwargs) -> list:
+        """
+        Gets list of Questions
+        """
         if self.request.user.is_staff:
-            queryset = Question.objects.all()
+            queryset = Question.objects.filter(status='actual').select_related('sender')
         elif self.request.user.is_authenticated:
-            queryset = Question.objects.filter(sender=self.request.user, status='actual')
+            queryset = Question.objects.filter(sender=self.request.user, status='actual').select_related('sender')
             query = self.request.GET.get("q")
             if query:
                 queryset = queryset.filter(
@@ -39,18 +45,27 @@ class QuestionViewSet(viewsets.ModelViewSet):
         except(KeyError, AttributeError):
             return super().get_serializer_class()
 
-    def create(self, request, *args, **kwargs):
+    def create(self, request, *args, **kwargs) -> JsonResponse:
+        """
+        Creates a Question
+        """
         request.data.update({'sender': self.request.user})
         return super(QuestionViewSet, self).create(request, *args, **kwargs)
 
-    def partial_update(self, request, *args, **kwargs):
-        question = Question.objects.get(pk=self.kwargs['pk'])
+    def partial_update(self, request, *args, **kwargs) -> JsonResponse:
+        """
+        Updates a Question status
+        """
+        question = Question.objects.select_related('sender').get(pk=self.kwargs['pk'])
         request.data.update({'sender': question.sender, 'title': question.title, 'text': question.text})
         if question.status != request.data['status']:
             send_email_message.delay(question.sender.email, question.title, request.data["status"])
         return super(QuestionViewSet, self).partial_update(request, *args, **kwargs)
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs) -> JsonResponse:
+        """
+        Creates a Message(Answer to Question)
+        """
         question = Question.objects.get(pk=self.kwargs['pk'])
         if question.status != 'actual':
             return HttpResponseNotAllowed('')
@@ -61,7 +76,6 @@ class QuestionViewSet(viewsets.ModelViewSet):
             if serializer.is_valid():
                 serializer.save()
                 return JsonResponse(serializer.data, status=status.HTTP_201_CREATED)
-
             return JsonResponse(serializer.errors, status=400)
 
 
@@ -80,7 +94,7 @@ class SolvedViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self, *args, **kwargs):
         if self.request.user.is_authenticated:
-            queryset = Question.objects.filter(status='solved')
+            queryset = Question.objects.filter(status='solved').select_related('sender')
             query = self.request.GET.get("q")
             if query:
                 queryset = queryset.filter(
